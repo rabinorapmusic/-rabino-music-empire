@@ -40,7 +40,6 @@ if st.button("🚀 GENERAR HIT PARA SUNO AI"):
             tab1, tab2 = st.tabs(["📜 LETRA", "🤖 PROMPT SUNO"])
             with tab1: st.code(letra)
             with tab2: st.code(prompt_suno)
-            st.download_button("⬇️ DESCARGAR", letra + "\n\n" + prompt_suno, "hit.txt")
 
 st.markdown("---")
 st.markdown("👑 **RABINO MUSIC EMPIRE** | Los Alcarrizos, RD 🇩🇴")
