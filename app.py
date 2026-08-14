@@ -1,45 +1,58 @@
-import streamlit as st
-import time
+import gradio as gr
+import random
+from gtts import gTTS
 
-st.set_page_config(page_title="RABINO RAP MUSIC PRO-MAX", layout="centered", page_icon="🎤")
+def cancion_duo(tema):
+    if tema == "":
+        return "Escribe un tema bro 😈 Ej: Dembow de Los Alcarrizos", None, ""
+    
+    artistas_tipo = [
+        ["Romeo Santos", "Karol G"],
+        ["Bad Bunny", "Rosalia"],
+        ["Aventura", "Shakira"],
+        ["Anuel", "Natti Natasha"],
+        ["Juan Luis Guerra", "Natti Natasha"],
+        ["El Alfa", "Becky G"]
+    ]
+    estilos = ["Bachata", "Reggaeton", "Dembow", "Trap", "Merengue"]
 
-st.markdown('<div style="font-size:100px;text-align:center;animation:pulse 2s infinite;">🎤</div>', unsafe_allow_html=True)
-st.markdown('<style>@keyframes pulse {0%{transform: scale(1);} 50%{transform: scale(1.1);} 100%{transform: scale(1);}}</style>', unsafe_allow_html=True)
-st.title("🔥 LA CABINA")
-st.subheader("RABINO RAP MUSIC PRO-MAX")
-st.markdown("---")
+    duo = random.choice(artistas_tipo)
+    estilo = random.choice(estilos)
 
-# CAMPO 1
-nombre = st.text_input("👤 Nombre del Artista", "Rabino")
+    cancion = f"""🔥 NUEVO DÚO: {duo[0]} x {duo[1]} 🔥
+**Género:** {estilo}
+**Tema:** {tema}
 
-# CAMPO 2
-col1, col2 = st.columns(2)
-with col1:
-    genero_bpm = {"Reggaeton": 100, "Dembow": 95, "Bachata": 120, "Trap": 140, "Rap": 85, "Rap Cristiano": 90}
-    genero = st.selectbox("🎵 Género", list(genero_bpm.keys()))
-    bpm_auto = genero_bpm[genero]
-with col2:
-    st.metric("⚡ BPM", bpm_auto)
+**[Verso 1 - {duo[0]}]**
+Llegué a tu vida como un dembow en la noche
+Con flow de barrio pero corazón de broche
+{tema}, baby, tú me tienes mal
 
-# CAMPO 3
-col3, col4, col5 = st.columns(3)
-with col3: modo = st.radio("🎙️ Modo", ["Solo", "Dúo"])
-with col4: idioma = st.selectbox("🌎 Idioma", ["Español", "English", "Bilingüe EN/ES"])
-with col5: vibe = st.selectbox("🔥 Vibe", ["Cristiano", "Secular", "Romántico", "Calle"])
+**[Coro - Los 2]**
+Dale que esto está caliente 
+Rabino Rap en el ambiente
+"""
+    # CREAR EL AUDIO
+    archivo = "cerebro.mp3"
+    tts = gTTS(cancion, lang='es')
+    tts.save(archivo)
+    
+    acordes = "TONO: D menor | ACORDES: Dm - Gm - C - F | 95 BPM"
+    return cancion, archivo, acordes
 
-# CAMPO 4
-tema = st.text_area("📖 Tema de la canción / Letra", "Ej: victoria, bendición")
+with gr.Blocks(title="RABINO RAP - Cerebro") as demo:
+    gr.Markdown("# 🧠 RABINO RAP APP")
+    gr.Markdown("Generador de Dúos + Voz + Acordes")
+    
+    tema = gr.Textbox(label="Escribe el tema", placeholder="Ej: Amor en Los Alcarrizos")
+    btn = gr.Button("Despertar a Cerebro 🔥")
+    
+    with gr.Row():
+        salida_texto = gr.Textbox(label="Tu Canción", lines=12)
+        audio = gr.Audio(label="Voz de Cerebro")
+    
+    acordes_out = gr.Textbox(label="Acordes para cantar")
+    
+    btn.click(cancion_duo, inputs=tema, outputs=[salida_texto, audio, acordes_out])
 
-if st.button("🚀 GENERAR HIT PARA SUNO AI"):
-    if tema:
-        with st.spinner("Creando..."):
-            time.sleep(2)
-            prompt_suno = f"{genero} {vibe} song, {bpm_auto} BPM, {idioma}, about {tema}"
-            letra = f"[HOOK]\nYo estoy en {tema}\n{bpm_auto} BPM dándole con fe\n{nombre}"
-            st.success("✅ HIT GENERADO")
-            tab1, tab2 = st.tabs(["📜 LETRA", "🤖 PROMPT SUNO"])
-            with tab1: st.code(letra)
-            with tab2: st.code(prompt_suno)
-
-st.markdown("---")
-st.markdown("👑 **RABINO MUSIC EMPIRE** | Los Alcarrizos, RD 🇩🇴")
+demo.launch()
