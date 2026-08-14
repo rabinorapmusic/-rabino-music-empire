@@ -1,4 +1,10 @@
-import gradio as gr
+gradio==4.44.0
+gTTS==2.5.4
+librosa==0.10.2
+transformers==4.44.2
+torch==2.4.1
+numpy==1.26.4
+soundfile==0.12.1import gradio as gr
 import random
 from gtts import gTTS
 
