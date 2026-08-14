@@ -1,64 +1,52 @@
-gradio==4.44.0
-gTTS==2.5.4
-librosa==0.10.2
-transformers==4.44.2
-torch==2.4.1
-numpy==1.26.4
-soundfile==0.12.1import gradio as gr
-import random
+import gradio as gr
 from gtts import gTTS
+import os
+import datetime
 
-def cancion_duo(tema):
-    if tema == "":
-        return "Escribe un tema bro 😈 Ej: Dembow de Los Alcarrizos", None, ""
+# FUNCIONES DE CEREBRO
+def generar_beat(estilo):
+    return f"🔥 Beat de {estilo} generado. BPM: 140. Listo para rapear Rabino."
+
+def escribir_letra(tema):
+    return f"""[VERSO 1 - Rabino]
+Yo soy Rabino en el beat, rompiendo el sistema
+{tema} es mi tema, el imperio es mi lema
+No me paran, no me frenan, soy la nueva era
+CEREBRO en la máquina, la rima verdadera
+
+[HOOK]
+Rabino, Rabino, el rey del imperio
+Con CEREBRO activo, rompo todo el criterio"""
+
+def clonar_voz(texto):
+    tts = gTTS(text=texto, lang='es')
+    filename = f"rabino_voz_{datetime.datetime.now().strftime('%H%M%S')}.mp3"
+    tts.save(filename)
+    return filename
+
+# INTERFAZ DE CEREBRO
+with gr.Blocks(title="CEREBRO - Rabino Music Empire", theme=gr.themes.Dark()) as demo:
     
-    artistas_tipo = [
-        ["Romeo Santos", "Karol G"],
-        ["Bad Bunny", "Rosalia"],
-        ["Aventura", "Shakira"],
-        ["Anuel", "Natti Natasha"],
-        ["Juan Luis Guerra", "Natti Natasha"],
-        ["El Alfa", "Becky G"]
-    ]
-    estilos = ["Bachata", "Reggaeton", "Dembow", "Trap", "Merengue"]
-
-    duo = random.choice(artistas_tipo)
-    estilo = random.choice(estilos)
-
-    cancion = f"""🔥 NUEVO DÚO: {duo[0]} x {duo[1]} 🔥
-**Género:** {estilo}
-**Tema:** {tema}
-
-**[Verso 1 - {duo[0]}]**
-Llegué a tu vida como un dembow en la noche
-Con flow de barrio pero corazón de broche
-{tema}, baby, tú me tienes mal
-
-**[Coro - Los 2]**
-Dale que esto está caliente 
-Rabino Rap en el ambiente
-"""
-    # CREAR EL AUDIO
-    archivo = "cerebro.mp3"
-    tts = gTTS(cancion, lang='es')
-    tts.save(archivo)
+    gr.Markdown("# 🧠 CEREBRO - Rabino Music Empire")
+    gr.Markdown("### La IA que domina la creación musical")
     
-    acordes = "TONO: D menor | ACORDES: Dm - Gm - C - F | 95 BPM"
-    return cancion, archivo, acordes
+    with gr.Tab("🎵 Generar Beat"):
+        estilo = gr.Dropdown(["Drill", "Trap", "Boombap", "Reggaeton"], label="Elige el estilo")
+        btn_beat = gr.Button("GENERAR BEAT 🔥")
+        salida_beat = gr.Textbox(label="Resultado")
+        btn_beat.click(generar_beat, inputs=estilo, outputs=salida_beat)
+    
+    with gr.Tab("✍️ Escribir Letra"):
+        tema = gr.Textbox(label="¿De qué quieres la letra?", placeholder="Ej: Dinero, Calle, Imperio")
+        btn_letra = gr.Button("ESCRIBIR LETRA ✍️")
+        salida_letra = gr.Textbox(label="Letra de Rabino", lines=10)
+        btn_letra.click(escribir_letra, inputs=tema, outputs=salida_letra)
+    
+    with gr.Tab("🎤 Clonar Voz"):
+        texto_voz = gr.Textbox(label="Escribe lo que dirá Rabino")
+        btn_voz = gr.Button("CLONAR VOZ 🎤")
+        salida_audio = gr.Audio(label="Audio de Rabino")
+        btn_voz.click(clonar_voz, inputs=texto_voz, outputs=salida_audio)
 
-with gr.Blocks(title="RABINO RAP - Cerebro") as demo:
-    gr.Markdown("# 🧠 RABINO RAP APP")
-    gr.Markdown("Generador de Dúos + Voz + Acordes")
-    
-    tema = gr.Textbox(label="Escribe el tema", placeholder="Ej: Amor en Los Alcarrizos")
-    btn = gr.Button("Despertar a Cerebro 🔥")
-    
-    with gr.Row():
-        salida_texto = gr.Textbox(label="Tu Canción", lines=12)
-        audio = gr.Audio(label="Voz de Cerebro")
-    
-    acordes_out = gr.Textbox(label="Acordes para cantar")
-    
-    btn.click(cancion_duo, inputs=tema, outputs=[salida_texto, audio, acordes_out])
-
-demo.launch()
+if __name__ == "__main__":
+    demo.launch()
